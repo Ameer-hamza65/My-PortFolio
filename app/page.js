@@ -1,19 +1,90 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Github, Linkedin, Mail, Phone, ExternalLink, Menu, X, ChevronDown, Sparkles, Brain, Code, Zap } from 'lucide-react';
+import { Github, Linkedin, Mail, Phone, ExternalLink, Menu, X, ChevronDown, Sparkles, Brain, Code, Zap, Award, BookOpen } from 'lucide-react';
 
 const Portfolio = () => {
   const [activeSection, setActiveSection] = useState('home');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
+  const [neurons, setNeurons] = useState([]);
+  const [connections, setConnections] = useState([]);
+  
+  // Animated Title State
+  const titles = [
+    { text: "Machine Learning Engineer", color: "from-emerald-400 to-cyan-400" },
+    { text: "AI Engineer", color: "from-purple-400 to-pink-400" },
+    { text: "Software Engineer", color: "from-cyan-400 to-blue-400" }
+  ];
+  const [currentTitleIndex, setCurrentTitleIndex] = useState(0);
+  const [displayedText, setDisplayedText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [charIndex, setCharIndex] = useState(0);
+
+  // Typewriter Effect
+  useEffect(() => {
+    const currentTitle = titles[currentTitleIndex].text;
+    
+    const timeout = setTimeout(() => {
+      if (!isDeleting) {
+        if (charIndex < currentTitle.length) {
+          setDisplayedText(currentTitle.substring(0, charIndex + 1));
+          setCharIndex(charIndex + 1);
+        } else {
+          setTimeout(() => setIsDeleting(true), 2000);
+        }
+      } else {
+        if (charIndex > 0) {
+          setDisplayedText(currentTitle.substring(0, charIndex - 1));
+          setCharIndex(charIndex - 1);
+        } else {
+          setIsDeleting(false);
+          setCurrentTitleIndex((currentTitleIndex + 1) % titles.length);
+        }
+      }
+    }, isDeleting ? 50 : 100);
+
+    return () => clearTimeout(timeout);
+  }, [charIndex, isDeleting, currentTitleIndex]);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
       setCursorPosition({ x: e.clientX, y: e.clientY });
     };
     window.addEventListener('mousemove', handleMouseMove);
+    
+    // Generate neurons for brain network
+    const newNeurons = Array.from({ length: 30 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 3 + 2,
+      pulseDelay: Math.random() * 3
+    }));
+    setNeurons(newNeurons);
+
+    // Generate connections between nearby neurons
+    const newConnections = [];
+    for (let i = 0; i < newNeurons.length; i++) {
+      for (let j = i + 1; j < newNeurons.length; j++) {
+        const dx = newNeurons[i].x - newNeurons[j].x;
+        const dy = newNeurons[i].y - newNeurons[j].y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 20) {
+          newConnections.push({
+            x1: newNeurons[i].x,
+            y1: newNeurons[i].y,
+            x2: newNeurons[j].x,
+            y2: newNeurons[j].y,
+            animationDelay: Math.random() * 2
+          });
+        }
+      }
+    }
+    setConnections(newConnections);
+    
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
@@ -25,6 +96,18 @@ const Portfolio = () => {
 
   const projects = [
     {
+      title: "SolveIt - AI Math & Physics Tutor",
+      description: "AI-powered tutoring system with step-by-step problem solving for math and physics",
+      tech: ["FastAPI", "Streamlit", "Gemini AI", "Python"],
+      features: [
+        "Comprehensive math tools: Algebra, Calculus, Geometry, Trigonometry",
+        "Physics modules: Kinematics, Dynamics, Energy, Electricity",
+        "Interactive unit conversion and step-by-step explanations"
+      ],
+      image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&q=80",
+      link: "https://github.com/Ameer-hamza65/SolveIt"
+    },
+    {
       title: "StudyBuddy",
       description: "AI-powered learning companion with RAG pipeline and dynamic quiz generation",
       tech: ["FastAPI", "Streamlit", "LangChain", "Gemini AI"],
@@ -34,7 +117,7 @@ const Portfolio = () => {
         "Instant scoring and feedback system"
       ],
       image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80",
-      link: "https://studybuddyforyou.streamlit.app/"
+      link: "https://github.com/Ameer-hamza65/StudyBuddy"
     },
     {
       title: "RAGcruit",
@@ -46,7 +129,7 @@ const Portfolio = () => {
         "Multi-resume ranking with trust score calculation"
       ],
       image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=800&q=80",
-      link: "#"
+      link: "https://github.com/Ameer-hamza65/RAGcruit"
     },
     {
       title: "LawLM - Legal Research Assistant",
@@ -58,7 +141,7 @@ const Portfolio = () => {
         "Semantic search through Supreme Court judgments"
       ],
       image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80",
-      link: "#"
+      link: "https://github.com/Ameer-hamza65/LawLM-Legal-Research"
     },
     {
       title: "Book Recommendation System",
@@ -70,7 +153,7 @@ const Portfolio = () => {
         "Interactive web interface"
       ],
       image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&q=80",
-      link: "#"
+      link: "https://github.com/Ameer-hamza65/Book-Recomendation-system-deployed"
     },
     {
       title: "AI Doctor with Speech & Vision",
@@ -82,7 +165,58 @@ const Portfolio = () => {
         "Text-to-speech responses"
       ],
       image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
-      link: "#"
+      link: "https://github.com/Ameer-hamza65/End-to-End-Doctor-with-Speech-and-vision"
+    }
+  ];
+
+  const certifications = [
+    {
+      title: "Machine Learning Specialization",
+      issuer: "Stanford University",
+      platform: "Coursera",
+      date: "2024",
+      link: "https://coursera.org/verify/specialization/MO3WJ7EPOQPO",
+      icon: <Award className="w-8 h-8" />
+    },
+    {
+      title: "Fundamentals of NLP and Transformers",
+      issuer: "NVIDIA",
+      platform: "Coursera",
+      date: "2024",
+      link: "https://coursera.org/verify/4CPBJ685ZFQI",
+      icon: <Brain className="w-8 h-8" />
+    },
+    {
+      title: "Supervised Machine Learning: Regression and Classification",
+      issuer: "Stanford University",
+      platform: "Coursera",
+      date: "2024",
+      link: "https://coursera.org/verify/L3CMXWHQM3ZQ",
+      icon: <BookOpen className="w-8 h-8" />
+    },
+    {
+      title: "Unsupervised Learning, Recommenders, Reinforcement Learning",
+      issuer: "Stanford University",
+      platform: "Coursera",
+      date: "2024",
+      link: "https://coursera.org/verify/M7KZET94G51P",
+      icon: <Sparkles className="w-8 h-8" />
+    },
+    {
+      title: "Gen AI Engineering with Transformers & LLMs",
+      issuer: "IBM",
+      platform: "Credly",
+      date: "2025",
+      link: "https://www.credly.com/go/y98CT9Cl",
+      icon: <Zap className="w-8 h-8" />
+    },
+    {
+      title: "Building Autonomous AI Agents with LangGraph",
+      issuer: "Packt",
+      platform: "Coursera",
+      date: "2024",
+      link: "https://coursera.org/verify/REBKXGYN34L3",
+      icon: <Code className="w-8 h-8" />
     }
   ];
 
@@ -122,7 +256,55 @@ const Portfolio = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-x-hidden">
+    <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden relative">
+      {/* Neural Network Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <svg className="w-full h-full opacity-30">
+          {/* Connections between neurons */}
+          {connections.map((conn, index) => (
+            <line
+              key={index}
+              x1={`${conn.x1}%`}
+              y1={`${conn.y1}%`}
+              x2={`${conn.x2}%`}
+              y2={`${conn.y2}%`}
+              stroke="url(#gradient)"
+              strokeWidth="1"
+              className="animate-pulse"
+              style={{ animationDelay: `${conn.animationDelay}s` }}
+            />
+          ))}
+          <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
+              <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.3" />
+            </linearGradient>
+          </defs>
+        </svg>
+
+        {/* Neurons */}
+        {neurons.map((neuron) => (
+          <div
+            key={neuron.id}
+            className="absolute rounded-full bg-emerald-400"
+            style={{
+              left: `${neuron.x}%`,
+              top: `${neuron.y}%`,
+              width: `${neuron.size}px`,
+              height: `${neuron.size}px`,
+              boxShadow: '0 0 20px rgba(16, 185, 129, 0.5)',
+              animationName: 'neuronPulse',
+              animationDuration: '2s',
+              animationIterationCount: 'infinite',
+              animationTimingFunction: 'ease-in-out',
+              animationDelay: `${neuron.pulseDelay}s`,
+            }}
+          />
+        ))}
+      </div>
+
+
+
       {/* Custom Cursor */}
       <div 
         className="fixed pointer-events-none z-50 mix-blend-difference"
@@ -146,7 +328,7 @@ const Portfolio = () => {
             </div>
             
             <div className="hidden md:flex space-x-8">
-              {['home', 'about', 'experience', 'skills', 'projects', 'contact'].map((section) => (
+              {['home', 'about', 'experience', 'skills', 'certifications', 'projects', 'contact'].map((section) => (
                 <button
                   key={section}
                   onClick={() => scrollToSection(section)}
@@ -170,7 +352,7 @@ const Portfolio = () => {
 
         {isMenuOpen && (
           <div className="md:hidden bg-slate-900/95 backdrop-blur-lg">
-            {['home', 'about', 'experience', 'skills', 'projects', 'contact'].map((section) => (
+            {['home', 'about', 'experience', 'skills', 'certifications', 'projects', 'contact'].map((section) => (
               <button
                 key={section}
                 onClick={() => scrollToSection(section)}
@@ -184,28 +366,62 @@ const Portfolio = () => {
       </nav>
 
       {/* Hero Section */}
-      <section id="home" className="min-h-screen flex items-center justify-center px-4 pt-16">
+      <section id="home" className="min-h-screen flex items-center justify-center px-4 pt-16 relative z-10">
         <div className="max-w-6xl mx-auto text-center">
-          <div className="mb-8 relative inline-block">
-            <div className="w-48 h-48 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 p-1 animate-pulse">
-              <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center overflow-hidden">
-                <img 
-                  src="/images/image.jpeg"
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                /> 
+          {/* Modern Hexagonal Profile Picture */}
+          <div className="mb-8 relative inline-block group">
+            <div className="relative w-64 h-64">
+              {/* Outer Hexagonal Border with Gradient */}
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-emerald-400 via-cyan-400 to-purple-400 p-1 animate-pulse">
+                <div className="w-full h-full rounded-3xl bg-slate-950"></div>
               </div>
+              
+              {/* Inner Image Container */}
+              <div className="absolute inset-3 rounded-3xl overflow-hidden group-hover:scale-105 transition-transform duration-500 shadow-2xl">
+                <img 
+                  src="/images/image.jpeg" 
+                  alt="Ameer Hamza"
+                  className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                />
+                
+                {/* Subtle Gradient Overlay on Hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/10 via-transparent to-cyan-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              </div>
+              
+              {/* Floating Corner Accents */}
+              <div className="absolute -top-2 -left-2 w-8 h-8 border-l-2 border-t-2 border-emerald-400"></div>
+              <div className="absolute -top-2 -right-2 w-8 h-8 border-r-2 border-t-2 border-cyan-400"></div>
+              <div className="absolute -bottom-2 -left-2 w-8 h-8 border-l-2 border-b-2 border-purple-400"></div>
+              <div className="absolute -bottom-2 -right-2 w-8 h-8 border-r-2 border-b-2 border-pink-400"></div>
+              
+              {/* Orbiting Particles */}
+              <div className="absolute -top-4 left-1/2 w-3 h-3 bg-emerald-400 rounded-full animate-ping"></div>
+              <div className="absolute top-1/2 -right-4 w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+              <div className="absolute -bottom-4 left-1/2 w-3 h-3 bg-purple-400 rounded-full animate-ping animation-delay-1000"></div>
+              <div className="absolute top-1/2 -left-4 w-2 h-2 bg-pink-400 rounded-full animate-pulse animation-delay-2000"></div>
+              
+              {/* Glow Effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 to-cyan-400/20 blur-2xl opacity-50 group-hover:opacity-70 transition-opacity duration-500 rounded-3xl"></div>
             </div>
-            <div className="absolute -top-4 -right-4 w-24 h-24 bg-emerald-400/20 rounded-full animate-ping"></div>
           </div>
 
-          <h1 className="text-6xl md:text-8xl font-bold mb-4 bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent animate-gradient">
+
+
+          <h1 className="text-6xl md:text-8xl font-bold mb-4 bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">
             Ameer Hamza
           </h1>
-          <p className="text-2xl md:text-4xl text-emerald-400 mb-6 font-light">
-            Machine Learning Engineer
-          </p>
-          <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-8">
+          
+          {/* Animated Typewriter Title */}
+          <div className="h-16 flex items-center justify-center">
+            <p className={`text-2xl md:text-4xl font-light bg-gradient-to-r ${titles[currentTitleIndex].color} bg-clip-text text-transparent`}>
+              {displayedText}
+              <span className="animate-blink">|</span>
+            </p>
+          </div>
+
+
+
+          <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-8 mt-4">
             Crafting intelligent AI solutions that solve real-world challenges. 
             Specialized in Generative AI, RAG Systems, and Agentic AI.
           </p>
@@ -213,7 +429,7 @@ const Portfolio = () => {
           <div className="flex flex-wrap justify-center gap-4 mb-12">
             <a 
               href="mailto:ameerhmza547@gmail.com"
-              className="flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-full transition-all transform hover:scale-105"
+              className="flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-full transition-all transform hover:scale-105 shadow-lg shadow-emerald-500/50"
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
             >
@@ -224,7 +440,7 @@ const Portfolio = () => {
               href="https://github.com/Ameer-hamza65"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-6 py-3 border-2 border-emerald-500 hover:bg-emerald-500/10 rounded-full transition-all"
+              className="flex items-center gap-2 px-6 py-3 border-2 border-emerald-500 hover:bg-emerald-500/10 rounded-full transition-all shadow-lg"
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
             >
@@ -234,16 +450,16 @@ const Portfolio = () => {
           </div>
 
           <div className="flex justify-center gap-6">
-            <a href="https://github.com/Ameer-hamza65" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-emerald-400 transition-colors">
+            <a href="https://github.com/Ameer-hamza65" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-emerald-400 transition-colors transform hover:scale-110">
               <Github className="w-6 h-6" />
             </a>
-            <a href="https://www.linkedin.com/in/ameer-hamza-710183272/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-emerald-400 transition-colors">
+            <a href="https://www.linkedin.com/in/ameer-hamza-710183272/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-emerald-400 transition-colors transform hover:scale-110">
               <Linkedin className="w-6 h-6" />
             </a>
-            <a href="mailto:ameerhmza547@gmail.com" className="text-gray-400 hover:text-emerald-400 transition-colors">
+            <a href="mailto:ameerhmza547@gmail.com" className="text-gray-400 hover:text-emerald-400 transition-colors transform hover:scale-110">
               <Mail className="w-6 h-6" />
             </a>
-            <a href="tel:+923055993795" className="text-gray-400 hover:text-emerald-400 transition-colors">
+            <a href="tel:+923055993795" className="text-gray-400 hover:text-emerald-400 transition-colors transform hover:scale-110">
               <Phone className="w-6 h-6" />
             </a>
           </div>
@@ -255,28 +471,27 @@ const Portfolio = () => {
       </section>
 
       {/* About Section */}
-      <section id="about" className="min-h-screen flex items-center justify-center px-4 py-20">
+      <section id="about" className="min-h-screen flex items-center justify-center px-4 py-20 relative z-10">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-5xl font-bold mb-12 text-center bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
             About Me
           </h2>
-          <div className="bg-white/5 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-emerald-500/20 hover:border-emerald-500/40 transition-all">
+          <div className="bg-white/5 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-emerald-500/20 hover:border-emerald-500/40 transition-all shadow-2xl">
             <p className="text-lg text-gray-300 leading-relaxed mb-6">
-            Turning ideas into intelligent systems.
+          Turning ideas into intelligent systems.
             </p>
             <p className="text-lg text-gray-300 leading-relaxed mb-6">
-             A Software Engineering student at UET Taxila, I specialize in Artificial Intelligence and Machine Learning, building real-world solutions powered by Generative AI.
+          A Software Engineering student at UET Taxila, I specialize in Artificial Intelligence and Machine Learning, building real-world solutions powered by Generative AI.
             </p>
             <p className="text-lg text-gray-300 leading-relaxed">
-             With hands-on experience in RAG-based chatbots, AI agents, and end-to-end ML systems, I’ve delivered impactful projects to international clients on Fiverr. My expertise spans Generative AI, NLP, and cutting-edge tools like LangChain, LangGraph, and LLMs.
-            Backed by certifications from Stanford and IBM and a CGPA of 3.37, I’m driven to push the boundaries of what AI can do.
+          With hands-on experience in RAG-based chatbots, AI agents, and end-to-end ML systems, I’ve delivered impactful projects to international clients on Fiverr. My expertise spans Generative AI, NLP, and cutting-edge tools like LangChain, LangGraph, and LLMs. Backed by certifications from Stanford and IBM and a CGPA of 3.37, I’m driven to push the boundaries of what AI can do.
             </p>
           </div>
         </div>
       </section>
 
       {/* Experience Section */}
-      <section id="experience" className="min-h-screen flex items-center justify-center px-4 py-20">
+      <section id="experience" className="min-h-screen flex items-center justify-center px-4 py-20 relative z-10">
         <div className="max-w-6xl mx-auto w-full">
           <h2 className="text-5xl font-bold mb-16 text-center bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
             My Experience
@@ -288,7 +503,7 @@ const Portfolio = () => {
             {experiences.map((exp, index) => (
               <div key={index} className={`flex flex-col md:flex-row items-center mb-16 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
                 <div className={`w-full md:w-1/2 ${index % 2 === 0 ? 'md:pr-12 md:text-right' : 'md:pl-12 md:text-left'} mb-8 md:mb-0`}>
-                  <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-emerald-500/20 hover:border-emerald-500/40 transition-all hover:scale-105 transform">
+                  <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-emerald-500/20 hover:border-emerald-500/40 transition-all hover:scale-105 transform shadow-xl">
                     <h3 className="text-2xl font-bold text-emerald-400 mb-2">{exp.title}</h3>
                     <p className="text-xl text-cyan-400 mb-1">{exp.company}</p>
                     <p className="text-gray-400 mb-1">{exp.location}</p>
@@ -301,7 +516,7 @@ const Portfolio = () => {
                   </div>
                 </div>
                 
-                <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center z-10 border-4 border-slate-900">
+                <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center z-10 border-4 border-slate-900 shadow-lg">
                   {exp.icon}
                 </div>
                 
@@ -311,7 +526,7 @@ const Portfolio = () => {
 
             <div className="flex flex-col md:flex-row items-center">
               <div className="w-full md:w-1/2 md:pr-12 md:text-right mb-8 md:mb-0">
-                <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-emerald-500/20 hover:border-emerald-500/40 transition-all hover:scale-105 transform">
+                <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-emerald-500/20 hover:border-emerald-500/40 transition-all hover:scale-105 transform shadow-xl">
                   <h3 className="text-2xl font-bold text-emerald-400 mb-2">BSc in Software Engineering</h3>
                   <p className="text-xl text-cyan-400 mb-1">University of Engineering and Technology, Taxila</p>
                   <p className="text-sm text-gray-500 mb-4">Sep 2022 - Jun 2026</p>
@@ -322,7 +537,7 @@ const Portfolio = () => {
                 </div>
               </div>
               
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center z-10 border-4 border-slate-900">
+              <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center z-10 border-4 border-slate-900 shadow-lg">
                 <Code className="w-6 h-6" />
               </div>
               
@@ -333,7 +548,7 @@ const Portfolio = () => {
       </section>
 
       {/* Skills Section */}
-      <section id="skills" className="min-h-screen flex items-center justify-center px-4 py-20">
+      <section id="skills" className="min-h-screen flex items-center justify-center px-4 py-20 relative z-10">
         <div className="max-w-6xl mx-auto w-full">
           <h2 className="text-5xl font-bold mb-16 text-center bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
             Skills
@@ -343,7 +558,7 @@ const Portfolio = () => {
             {Object.entries(skills).map(([category, items]) => (
               <div 
                 key={category}
-                className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-emerald-500/20 hover:border-emerald-500/40 transition-all transform hover:scale-105"
+                className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-emerald-500/20 hover:border-emerald-500/40 transition-all transform hover:scale-105 shadow-xl"
               >
                 <h3 className="text-2xl font-bold text-emerald-400 mb-6 flex items-center gap-3">
                   <Zap className="w-6 h-6" />
@@ -353,7 +568,7 @@ const Portfolio = () => {
                   {items.map((skill) => (
                     <span 
                       key={skill}
-                      className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-full text-sm border border-emerald-500/30 transition-all cursor-default"
+                      className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-full text-sm border border-emerald-500/30 transition-all cursor-default transform hover:scale-105"
                       onMouseEnter={() => setIsHovering(true)}
                       onMouseLeave={() => setIsHovering(false)}
                     >
@@ -367,18 +582,60 @@ const Portfolio = () => {
         </div>
       </section>
 
+      {/* Certifications Section */}
+      <section id="certifications" className="min-h-screen flex items-center justify-center px-4 py-20 relative z-10">
+        <div className="max-w-7xl mx-auto w-full">
+          <h2 className="text-5xl font-bold mb-16 text-center bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+            Certifications
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {certifications.map((cert, index) => (
+              <div 
+                key={index}
+                className="group bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-emerald-500/20 hover:border-emerald-500/40 transition-all transform hover:scale-105 hover:-translate-y-2 shadow-xl"
+                onMouseEnter={() => setIsHovering(true)}
+                onMouseLeave={() => setIsHovering(false)}
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 bg-emerald-500/10 rounded-lg text-emerald-400 group-hover:scale-110 transition-transform">
+                    {cert.icon}
+                  </div>
+                  <span className="text-xs text-gray-500">{cert.date}</span>
+                </div>
+                
+                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">
+                  {cert.title}
+                </h3>
+                <p className="text-cyan-400 text-sm mb-1">{cert.issuer}</p>
+                <p className="text-gray-500 text-xs mb-4">{cert.platform}</p>
+                
+                <a 
+                  href={cert.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors text-sm font-semibold"
+                >
+                  Verify Certificate <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Projects Section */}
-      <section id="projects" className="min-h-screen flex items-center justify-center px-4 py-20">
+      <section id="projects" className="min-h-screen flex items-center justify-center px-4 py-20 relative z-10">
         <div className="max-w-7xl mx-auto w-full">
           <h2 className="text-5xl font-bold mb-16 text-center bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
             Featured Projects
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {projects.map((project, index) => (
               <div 
                 key={index}
-                className="group bg-white/5 backdrop-blur-lg rounded-2xl overflow-hidden border border-emerald-500/20 hover:border-emerald-500/40 transition-all transform hover:scale-105"
+                className="group bg-white/5 backdrop-blur-lg rounded-2xl overflow-hidden border border-emerald-500/20 hover:border-emerald-500/40 transition-all transform hover:scale-105 hover:-translate-y-2 shadow-xl"
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
               >
@@ -415,25 +672,39 @@ const Portfolio = () => {
                     ))}
                   </div>
 
-                  {project.link !== "#" && (
-                    <a 
-                      href={project.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors"
-                    >
-                      View Project <ExternalLink className="w-4 h-4" />
-                    </a>
-                  )}
+                  <a 
+                    href={project.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors"
+                  >
+                    View on GitHub <ExternalLink className="w-4 h-4" />
+                  </a>
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Explore More Button */}
+          <div className="text-center">
+            <a 
+              href="https://github.com/Ameer-hamza65"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 rounded-full transition-all transform hover:scale-105 shadow-lg shadow-emerald-500/50 text-lg font-semibold"
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+            >
+              <Github className="w-6 h-6" />
+              Explore More Projects on GitHub
+              <ExternalLink className="w-5 h-5" />
+            </a>
           </div>
         </div>
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="min-h-screen flex items-center justify-center px-4 py-20">
+      <section id="contact" className="min-h-screen flex items-center justify-center px-4 py-20 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-emerald-400 mb-4 font-mono">What's Next</p>
           <h2 className="text-5xl font-bold mb-8 text-gray-200">
@@ -445,7 +716,7 @@ const Portfolio = () => {
 
           <a 
             href="mailto:ameerhmza547@gmail.com"
-            className="inline-block px-8 py-4 border-2 border-emerald-400 text-emerald-400 hover:bg-emerald-400/10 rounded-lg transition-all transform hover:scale-105 text-lg font-mono"
+            className="inline-block px-8 py-4 border-2 border-emerald-400 text-emerald-400 hover:bg-emerald-400/10 rounded-lg transition-all transform hover:scale-105 text-lg font-mono shadow-lg shadow-emerald-500/30"
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
           >
